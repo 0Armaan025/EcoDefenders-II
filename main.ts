@@ -4,9 +4,29 @@ namespace SpriteKind {
     export const wildfire = SpriteKind.create()
     export const wildfire_tree = SpriteKind.create()
     export const water_gun = SpriteKind.create()
+    export const cafetaria = SpriteKind.create()
 }
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     b_button = 1
+    projectile = sprites.createProjectileFromSprite(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . f f f f f f f f f . . . . 
+        . . f f 8 8 8 8 8 8 8 f f . . . 
+        . . f 8 c c c c c c c 8 f . . . 
+        . . f 8 c 9 9 9 9 9 c 8 f . . . 
+        . . f 8 c 9 9 9 9 9 c 8 f . . . 
+        . . f 8 c 9 9 9 9 9 c 8 f . . . 
+        . . f 8 c 9 9 9 9 9 c 8 f . . . 
+        . . f 8 c 9 9 9 9 9 c 8 f . . . 
+        . . f 8 c c c c c c c 8 f . . . 
+        . . f f 8 8 8 8 8 8 8 f f . . . 
+        . . . f f f f f f f f f . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, water_gun, 150, 0)
+    b_button = 0
 })
 function makeWildFire () {
     x_temp_var = 300
@@ -263,6 +283,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.wildfire_tree, function (sprite,
         game.showLongText("Hahaha! Warrior Now face the wildfire challenge!!! Hahaha", DialogLayout.Center)
         game.showLongText("A wildfire is a large, uncontrolled fire that burns in a natural area such as a forest, grassland or prairie. Wildfires can spread quickly and can be very dangerous. They are often started by lightning", DialogLayout.Center)
         game.showLongText("Click on B button to use your 10 points to get a power up item!", DialogLayout.Center)
+        info.changeScoreBy(-10)
         if (b_button == 0) {
             game.showLongText("Wohoo! Find the mystery water gun to save the trees!!", DialogLayout.Bottom)
             water_gun = sprites.create(img`
@@ -283,49 +304,57 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.wildfire_tree, function (sprite,
         check_2 = 1
     }
 })
+sprites.onOverlap(SpriteKind.Player, SpriteKind.cafetaria, function (sprite, otherSprite) {
+    if (new_check == 0) {
+        game.showLongText("Welcome to Cafeteria!", DialogLayout.Bottom)
+        food_choice = game.askForString("What do you want to eat?", 6)
+        if (food_choice == "apple") {
+            game.showLongText("It's healty! that's correct!", DialogLayout.Bottom)
+            info.changeScoreBy(10)
+        } else if (food_choice == "burger") {
+            game.showLongText("It's not healthy! Please don't eat in excess!", DialogLayout.Bottom)
+            info.changeScoreBy(-10)
+        }
+        new_check = 1
+    }
+})
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.wildfire_tree, function (sprite, otherSprite) {
+    if (wildfire_counter == 5) {
+        sprites.destroy(water_gun, effects.spray, 500)
+        sprites.destroyAllSpritesOfKind(SpriteKind.wildfire_tree, effects.clouds, 100)
+        effects.clouds.endScreenEffect()
+        game.showLongText("Yohoooo! You helped to solve the wildfire but now time to make it harder! hahahaha!", DialogLayout.Bottom)
+    } else {
+        wildfire_counter += 1
+        pause(5000)
+        pause(5000)
+    }
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.water_gun, function (sprite, otherSprite) {
     if (check_check_1 == 0) {
         info.changeScoreBy(15)
         water_gun_following = 1
-        game.showLongText("click B to use your 5 points as water gun projectiles", DialogLayout.Bottom)
+        game.showLongText("Click B to shoot water projectiles", DialogLayout.Bottom)
         water_gun.follow(mySprite)
-        if (water_gun_following == 1) {
-            if (b_button == 0) {
-                projectile = sprites.createProjectileFromSprite(img`
-                    . . . . . . . . . . . . . . . . 
-                    . . . . . . . . . . . . . . . . 
-                    . . . . . . . . . . . . . . . . 
-                    . . . . f f f f f f f . . . . . 
-                    . . . f f 9 9 9 9 9 f f . . . . 
-                    . . . f 9 9 a a a 9 9 f . . . . 
-                    . . . f 9 a a a a a 9 f . . . . 
-                    . . . f 9 a a a a a 9 f . . . . 
-                    . . . f 9 a a a a a 9 f . . . . 
-                    . . . f 9 9 a a a 9 9 f . . . . 
-                    . . . f f 9 9 9 9 9 f f . . . . 
-                    . . . . f f f f f f f . . . . . 
-                    . . . . . . . . . . . . . . . . 
-                    . . . . . . . . . . . . . . . . 
-                    . . . . . . . . . . . . . . . . 
-                    . . . . . . . . . . . . . . . . 
-                    `, water_gun, 100, 0)
-            }
-        }
         check_check_1 = 1
     }
 })
-let projectile: Sprite = null
-let water_gun: Sprite = null
+let food_choice = ""
 let wildfire_tree_1: Sprite = null
 let x_temp_var = 0
+let water_gun: Sprite = null
+let projectile: Sprite = null
+let wildfire_counter = 0
 let water_gun_following = 0
 let check_2 = 0
 let check_check_1 = 0
 let check_1 = 0
 let a_button = 0
 let axe: Sprite = null
+let new_check = 0
 let b_button = 0
 let mySprite: Sprite = null
+let list: tiles.TileMapData[] = []
 scene.setBackgroundImage(img`
     fffffffcbccffffffffffcfbddddddddddd111111111111111111111111dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbffcddffffffcfcfffff
     fffffffccffffcffffffbfddddddddd11111111111111111111111111111111ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddfccdbffffffffffffff
@@ -448,7 +477,9 @@ scene.setBackgroundImage(img`
     fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbffffbffffdfffcddcfffffffffffffffff
     fffffffffffffffffffffffffffffffffbffffffbffffffffffffffffffffffbfcffffcfffffffffffffffcffffffffffffffffffffffffffffffffffffffffffffffffffffdddffffffffffccffffff
     `)
-tiles.setCurrentTilemap(tilemap`level1`)
+list.push(tilemap`level3`)
+list.push(tilemap`level1`)
+tiles.setCurrentTilemap(list[1])
 game.splash("Welcome Warrior to Level 2!", "Use A to interact")
 game.splash("You did a great job contributing to Swach Bharat Abhyan!!")
 game.splash("But now, time to make it harder! Ha!Ha!ha")
@@ -474,6 +505,7 @@ controller.moveSprite(mySprite, 100, 100)
 mySprite.ay = 500
 b_button = 0
 scene.cameraFollowSprite(mySprite)
+new_check = 0
 axe = sprites.create(img`
     f f f f f f f f f f 
     e e e e e e e e e e 
@@ -530,6 +562,57 @@ let tree = sprites.create(img`
     ...............fceeec...............
     ...............ffceec...............
     `, SpriteKind.tree)
+let cafeteria = sprites.create(img`
+    ....................8a8aa8a8....................
+    .................aaa888aa8a8aaa.................
+    ..............aaa8aa8a8aa888aa8aaa..............
+    ...........8aa8aa8888a8aa8a8888aa8aa8...........
+    ........8888aa8aa8aa8a8aa8a8aa8aa8aa8888........
+    .....aaa8aa8aa8888aa8a8aa8a8aa8888aa8aa8aaa.....
+    ...aa8888aa8aa8aa8aa888aa888aa8aa8aa8aa8888aa...
+    dccaa8aa8aa8888aa8aa8a8aa8a8aa8aa8888aa8aa8aaccd
+    bcb888aa8aa8aa8aa8aa8a8aa8a8aa8aa8aa8aa8aa888bcb
+    dbbaa8aa8888aa8aa8888a8aa8a8888aa8aa8888aa8aabbd
+    dbbaa8aa8aa8aa8888aa8a8aa8a8aa8888aa8aa8aa8aabbd
+    dccaa8888aa8aa8aa8aa888aa888aa8aa8aa8aa8888aaccd
+    bcbaa8aa8aa8888aa8aa8a8aa8a8aa8aa8888aa8aa8aabcb
+    dbb888aa8aa8aa8aa8aa8a8aa8a8aa8aa8aa8aa8aa888bbd
+    dbbaa8aa8888aa8aa8aa8a8aa8a8aa8aa8aa8888aa8aabbd
+    dccaa8aa8aa8aa8aa8888a8aa8a8888aa8aa8aa8aa8aaccd
+    bcbaa8888aa8aa8888aa888aa888aa8888aa8aa8888aabcb
+    dbbaa8aa8aa8888aa8aa8a8aa8a8aa8aa8888aa8aa8aabbd
+    dbb888aa8aa8aa8aa8aa8a8aa8a8aa8aa8aa8aa8aa888bbd
+    dccaa8aa8888aa8aa8aa8a8aa8a8aa8aa8aa8888aa8aaccd
+    bcbaa8aa8aa8aa8aa8aa888aa888aa8aa8aa8aa8aa8aabcb
+    dbbaa8888aa8aa8aa888ccbbbbcc888aa8aa8aa8888aabbd
+    dbbaa8aa8aa8aa888ccbbbbbbbbbbcc888aa8aa8aa8aabbd
+    dcc888aa8aa888ccbbbbbccccccbbbbbcc888aa8aa888ccd
+    bcbaa8aa888ccbbbbbccbddddddbccbbbbbcc888aa8aabcb
+    dbbaa8aaccbbbbbccbddddddddddddbccbbbbbccaa8aabbd
+    dbbaaccbbbbcccbddddddddddddddddddbcccbbbbccaabbd
+    dcccbbbbcccbdddbccbbbbbbbbbbbbccbdddbcccbbbbcccd
+    ccccccccbbbbbbbcbddddddddddddddbcbbbbbbbcccccccc
+    bddddddddddddbcddddddddddddddddddcbddddddddddddb
+    bbcbdddddddddcbd1111111111111111dbcdddddddddbcbb
+    bbbcccccccccccd1bbbbbbbbbbbbbbbb1dcccccccccccbbb
+    bbbbdddddddddc11beeeeeeeeeeeeeeb11cdddddddddbbbb
+    bbb8aaaaaaa8dc1be3b33b33b33b33beb1cd8aaaaaaa8bbb
+    bbb888888888dc1be3b33b33b33b33beb1cd888888888bbb
+    bbb833333338dcbbf3b3effffffe33bebbcd833333338bbb
+    bbb83ff3ff38dcbbf3bffffffffff3bebbcd83ff3ff38bbb
+    bbb83cc3cc38dcbbf3effffffffffebebbcd83cc3cc38bbb
+    bbb833333338dcbbf3eeeeeeeeeeeebebbcd833333338bbb
+    cbb83ff3ff38dcbbe3b33b33b33b33bebbcd83ff3ff38bbc
+    cbb83cc3cc38dcbbe3b33b33b33b33bebbcd83cc3cc38bbc
+    ccbbbbbbbbbbdcbbe3b33b33b33feeeebbcdbbbbbbbbbbcc
+    .cbbdddddddddcbbe3b33b33b33ffffebbcdddddddddbbc.
+    ..cbdbbbdbbbdcbbf3b33b33b33f33febbcdbbbdbbbdbc..
+    ...cdbbbdbbbdcbbf3b33b33b33bffeebbcdbbbdbbbdc...
+    ....bddddddddcbbf3b33b33b33b33bebbcddddddddb....
+    .....bdbbbdddcbbf3b33b33b33b33bebbcdddbbbdb.....
+    ......bcccbbbcbbe3b33b33b33b33bebbcbbbcccb......
+    `, SpriteKind.cafetaria)
+cafeteria.setPosition(600, 170)
 tree.setPosition(170, 170)
 a_button = 0
 info.setScore(0)
@@ -538,3 +621,4 @@ check_check_1 = 0
 makeWildFire()
 check_2 = 0
 water_gun_following = 0
+wildfire_counter = 0
