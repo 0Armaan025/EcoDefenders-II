@@ -6,6 +6,15 @@ namespace SpriteKind {
     export const water_gun = SpriteKind.create()
     export const cafetaria = SpriteKind.create()
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile1`, function (sprite, location) {
+    if (last_check == 0) {
+        info.changeScoreBy(100)
+        game.showLongText("yayyy! warrior, you have won the game!", DialogLayout.Bottom)
+        game.showLongText("Let's save the environment to make Bharat better!", DialogLayout.Bottom)
+        game.showLongText("I hope you like the game made by SHCS💓", DialogLayout.Bottom)
+        last_check = 1
+    }
+})
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     b_button = 1
     projectile = sprites.createProjectileFromSprite(img`
@@ -354,6 +363,7 @@ let axe: Sprite = null
 let new_check = 0
 let b_button = 0
 let mySprite: Sprite = null
+let last_check = 0
 let list: tiles.TileMapData[] = []
 scene.setBackgroundImage(img`
     fffffffcbccffffffffffcfbddddddddddd111111111111111111111111dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbffcddffffffcfcfffff
@@ -480,6 +490,7 @@ scene.setBackgroundImage(img`
 list.push(tilemap`level3`)
 list.push(tilemap`level1`)
 tiles.setCurrentTilemap(list[1])
+last_check = 0
 game.splash("Welcome Warrior to Level 2!", "Use A to interact")
 game.splash("You did a great job contributing to Swach Bharat Abhyan!!")
 game.splash("But now, time to make it harder! Ha!Ha!ha")
